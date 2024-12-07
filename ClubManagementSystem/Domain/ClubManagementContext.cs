@@ -1,8 +1,8 @@
-namespace ClubManagementSystem;
-using Domain;
+namespace ClubManagementSystem.Domain;
 using Microsoft.EntityFrameworkCore;
+using System;
 
-    public class ClubManagementContext : DbContext
+public class ClubManagementContext : DbContext
     {
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Professor> Professors { get; set; } = null!;
@@ -135,4 +135,3 @@ using Microsoft.EntityFrameworkCore;
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
-    
