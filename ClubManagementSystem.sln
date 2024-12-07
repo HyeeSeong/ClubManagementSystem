@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubManagementSystem", "ClubManagementSystem\ClubManagementSystem.csproj", "{824C8C73-7DFB-45D5-954A-E8B1EFB9E74C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{824C8C73-7DFB-45D5-954A-E8B1EFB9E74C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{824C8C73-7DFB-45D5-954A-E8B1EFB9E74C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{824C8C73-7DFB-45D5-954A-E8B1EFB9E74C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{824C8C73-7DFB-45D5-954A-E8B1EFB9E74C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
