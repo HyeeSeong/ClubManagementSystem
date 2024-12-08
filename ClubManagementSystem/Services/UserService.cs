@@ -1,7 +1,6 @@
 using ClubManagementSystem.Domain;
 
 namespace ClubManagementSystem.Services;
-using Microsoft.EntityFrameworkCore;
 
 public class UserService
 {
@@ -284,7 +283,7 @@ public class UserService
     {
         while (true)
         {
-            Console.WriteLine("유저를 검색합니다. 성(LastName) 또는 이메일을 입력하세요 (빈 값 입력 시 검색 취소):");
+            Console.WriteLine("유저를 검색합니다. 이름(LastName) 또는 이메일을 입력하세요 (빈 값 입력 시 검색 취소):");
             string input = Console.ReadLine()?.Trim();
 
             if (string.IsNullOrWhiteSpace(input))
@@ -337,7 +336,6 @@ public class UserService
             Console.WriteLine("유효하지 않은 UserID입니다. 다시 입력해주세요.");
         }
     }
-
     
     public void PrintAllUsers()
     {
