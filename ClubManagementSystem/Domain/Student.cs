@@ -1,15 +1,13 @@
 namespace ClubManagementSystem.Domain;
 
-public class Student : User
+public class Student
 {
-    // Student 전용 속성
-    public string Status { get; set; } = "";
+    public int UserID { get; set; }
+    public string Status { get; set; } = null!;
     public int Year { get; set; } = 1;
-
-    // 외래키
     public int? ClubID { get; set; }
 
-    // Navigation Properties
+    public User User { get; set; } = null!;
     public Club? Club { get; set; }
-    public ICollection<Participation> Participations { get; set; } = new List<Participation>();
+    public ICollection<Participation>? Participations { get; set; }
 }

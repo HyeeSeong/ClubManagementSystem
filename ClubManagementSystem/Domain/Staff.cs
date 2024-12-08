@@ -1,7 +1,9 @@
 namespace ClubManagementSystem.Domain;
 
-public class Staff : User
+public class Staff
 {
-    // Staff 전용 속성
-    public string Position { get; set; } = "";
+    public int UserID { get; set; }
+
+    public User User { get; set; } = null!;
+    public ICollection<Club>? Clubs { get; set; }
 }
