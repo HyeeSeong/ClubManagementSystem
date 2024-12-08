@@ -165,6 +165,210 @@ public class UserService
             return false;
         }
     }
+    public bool DeleteUser()
+    {
+        try
+        {
+            // 유저 검색
+            var user = FindUser();
+            if (user == null)
+            {
+                return true; // 빈 값 입력 시 삭제하지 않음
+            }
+
+            // 삭제 확인
+            Console.WriteLine($"선택한 유저를 삭제합니다: {user}");
+            Console.WriteLine("정말 삭제하시겠습니까? (Y/N)");
+            string confirmation = Console.ReadLine()?.Trim().ToUpper();
+            if (confirmation == "Y")
+            {
+                context.Users.Remove(user);
+                context.SaveChanges();
+                Console.WriteLine("유저가 성공적으로 삭제되었습니다.");
+                return true;
+            }
+
+            Console.WriteLine("삭제가 취소되었습니다.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+            return false;
+        }
+    }
+    public bool UpdateUser()
+    {
+        try
+        {
+            // 유저 검색
+            var user = FindUser();
+            if (user == null)
+            {
+                return true; // 빈 값 입력 시 업데이트하지 않음
+            }
+
+            Console.WriteLine($"선택한 유저를 업데이트합니다: {user}");
+            Console.Write("[1. 성 ");
+            Console.Write("2. 이름 ");
+            Console.Write("3. 이메일 ");
+            Console.Write("4. 휴대폰 번호 ");
+            Console.Write("5. 생년월일 ");
+            Console.Write("6. 추가 정보 ");
+            Console.WriteLine("Enter를 눌러 종료합니다.]");
+
+            while (true)
+            {
+                Console.Write("\n속성 번호를 입력하세요 (Enter를 눌러 종료): ");
+                string option = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(option))
+                {
+                    Console.WriteLine("업데이트를 종료합니다.");
+                    break; // Enter 입력 시 종료
+                }
+
+                switch (option)
+                {
+                    case "1": // 성
+                        user.FirstName = GetInput<string>("새로운 성 (Enter를 눌러 건너뛰기)", _ => true, "", input => string.IsNullOrWhiteSpace(input) ? user.FirstName : input);
+                        Console.WriteLine("성 변경 완료.");
+                        break;
+                    case "2": // 이름
+                        user.LastName = GetInput<string>("새로운 이름 (Enter를 눌러 건너뛰기)", _ => true, "", input => string.IsNullOrWhiteSpace(input) ? user.LastName : input);
+                        Console.WriteLine("이름 변경 완료.");
+                        break;
+                    case "3": // 이메일
+                        user.Email = GetInput<string>(
+                            "새로운 이메일 (Enter를 눌러 건너뛰기)",
+                            input => string.IsNullOrWhiteSpace(input) || !context.Users.Any(u => u.Email == input),
+                            "중복된 이메일입니다. 다시 입력해주세요.",
+                            input => string.IsNullOrWhiteSpace(input) ? user.Email : input
+                        );
+                        Console.WriteLine("이메일 변경 완료.");
+                        break;
+                    case "4": // 휴대폰 번호
+                        user.PhoneNumber = GetInput<string>("새로운 휴대폰 번호 (Enter를 눌러 건너뛰기)", _ => true, "", input => string.IsNullOrWhiteSpace(input) ? user.PhoneNumber : input);
+                        Console.WriteLine("휴대폰 번호 변경 완료.");
+                        break;
+                    case "5": // 생년월일
+                        user.Birth = GetInput<DateTime?>(
+                            "새로운 생년월일 (Enter를 눌러 건너뛰기)", 
+                            input => string.IsNullOrWhiteSpace(input) || DateTime.TryParse(input, out _),
+                            "유효하지 않은 날짜입니다. 다시 입력해주세요.",
+                            input => string.IsNullOrWhiteSpace(input) ? user.Birth : DateTime.Parse(input)
+                        );
+                        Console.WriteLine("생년월일 변경 완료.");
+                        break;
+                    case "6": // 추가 정보
+                        user.Description = GetInput<string>("새로운 추가 정보 (Enter를 눌러 건너뛰기)", _ => true, "", input => string.IsNullOrWhiteSpace(input) ? user.Description : input);
+                        Console.WriteLine("추가 정보 변경 완료.");
+                        break;
+                    default:
+                        Console.WriteLine("유효하지 않은 선택입니다. 다시 입력해주세요.");
+                        break;
+                }
+            }
+
+            context.SaveChanges();
+            Console.WriteLine("유저 정보가 성공적으로 업데이트되었습니다.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+            return false;
+        }
+    }
+    
+    private User? FindUser()
+    {
+        while (true)
+        {
+            Console.WriteLine("유저를 검색합니다. 성(LastName) 또는 이메일을 입력하세요 (빈 값 입력 시 검색 취소):");
+            string input = Console.ReadLine()?.Trim();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null; // 검색 취소
+            }
+
+            // 이메일로 검색
+            var userByEmail = context.Users.FirstOrDefault(u => u.Email == input);
+            if (userByEmail != null)
+            {
+                return userByEmail;
+            }
+
+            // LastName으로 검색
+            var usersByLastName = context.Users
+                .Where(u => u.LastName.Contains(input))
+                .ToList();
+
+            if (usersByLastName.Count == 0)
+            {
+                Console.WriteLine("검색 결과가 없습니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            // LastName 검색 결과 출력
+            Console.WriteLine("[검색 결과]");
+            foreach (var u in usersByLastName)
+            {
+                Console.WriteLine($"UserID: {u.UserID}, 이름: {u.FirstName} {u.LastName}, 이메일: {u.Email}");
+            }
+
+            // UserID로 선택
+            Console.WriteLine("위 목록에서 UserID를 입력하세요 (빈 값 입력 시 취소):");
+            string idInput = Console.ReadLine()?.Trim();
+            if (string.IsNullOrWhiteSpace(idInput))
+            {
+                return null; // 검색 취소
+            }
+
+            if (int.TryParse(idInput, out int userId))
+            {
+                var selectedUser = usersByLastName.FirstOrDefault(u => u.UserID == userId);
+                if (selectedUser != null)
+                {
+                    return selectedUser;
+                }
+            }
+
+            Console.WriteLine("유효하지 않은 UserID입니다. 다시 입력해주세요.");
+        }
+    }
+
+    
+    public void PrintAllUsers()
+    {
+        try
+        {
+            var users = context.Users.ToList();
+
+            if (!users.Any())
+            {
+                Console.WriteLine("등록된 유저가 없습니다.");
+                return;
+            }
+
+            Console.WriteLine("\n[등록된 유저 목록]");
+            Console.WriteLine("==========================================");
+            foreach (var user in users)
+            {
+                Console.Write($"[{user.UserID}] ");
+                Console.Write($"이름: {user.FirstName} {user.LastName}, ");
+                Console.Write($"이메일: {user.Email}, ");
+                Console.Write($"휴대폰 번호: {user.PhoneNumber}, ");
+                Console.WriteLine($"생년월일: {user.Birth:yyyy-MM-dd}, ");
+                Console.WriteLine($"추가 정보: {(string.IsNullOrWhiteSpace(user.Description) ? "(없음)" : user.Description)}");
+                Console.WriteLine("==========================================");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+        }
+    }
     
     // 제네릭 입력 함수
     static T GetInput<T>(string prompt, Func<string, bool> validator, string errorMessage = "유효하지 않은 입력입니다.", Func<string, T> parser = null)
