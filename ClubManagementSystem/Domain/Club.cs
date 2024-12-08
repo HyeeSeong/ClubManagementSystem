@@ -16,6 +16,6 @@ public class Club
 
     public override string ToString()
     {
-        return $"[동아리 번호 : {ClubID}, 동아리 이름 : {ClubName}]";
+        return $"[{ClubID}], 동아리 이름 : {ClubName}]";
     }
 }

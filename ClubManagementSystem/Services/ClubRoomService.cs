@@ -133,7 +133,7 @@ public class ClubRoomService
             Console.WriteLine("[동아리방 목록]");
             foreach (var room in clubRooms)
             {
-                Console.WriteLine($"ClubRoomID: {room.ClubRoomID}, Location: {room.Location}, Size: {room.Size}, Status: {room.Status}");
+                Console.WriteLine($"[{room.ClubRoomID}] Location: {room.Location}, Size: {room.Size}, Status: {room.Status}");
             }
         }
         catch (Exception ex)
@@ -147,7 +147,7 @@ public class ClubRoomService
     {
         while (true)
         {
-            Console.WriteLine("동아리방을 검색합니다. Location 또는 ClubRoomID를 입력하세요 (빈 값 입력 시 검색 취소):");
+            Console.Write("동아리방을 검색합니다. Location 또는 ClubRoomID를 입력하세요 (빈 값 입력 시 검색 취소): ");
             string input = Console.ReadLine()?.Trim();
             if (string.IsNullOrWhiteSpace(input)) return null;
 

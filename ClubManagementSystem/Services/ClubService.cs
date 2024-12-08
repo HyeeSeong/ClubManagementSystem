@@ -254,7 +254,7 @@ public class ClubService
             Console.WriteLine("[동아리 목록]");
             foreach (var c in clubs)
             {
-                Console.WriteLine($"ClubID: {c.ClubID}, ClubName: {c.ClubName}, Professor: {c.Professor.User.FirstName} {c.Professor.User.LastName}, Staff: {c.Staff.User.FirstName} {c.Staff.User.LastName}, ClubRoomID: {(c.ClubRoomID.HasValue ? c.ClubRoomID.ToString() : "(없음)")}");
+                Console.WriteLine($"[{c.ClubID}] ClubName: {c.ClubName}, Professor: {c.Professor.User.FirstName} {c.Professor.User.LastName}, Staff: {c.Staff.User.FirstName} {c.Staff.User.LastName}, ClubRoomID: {(c.ClubRoomID.HasValue ? c.ClubRoomID.ToString() : "(없음)")}");
             }
         }
         catch (Exception ex)
@@ -267,7 +267,7 @@ public class ClubService
     {
         while (true)
         {
-            Console.WriteLine("동아리를 검색합니다. 동아리 이름 또는 ClubID를 입력하세요(Enter 취소):");
+            Console.Write("동아리를 검색합니다. 동아리 이름 또는 ClubID를 입력하세요(Enter 취소): ");
             string input = Console.ReadLine()?.Trim();
             if (string.IsNullOrWhiteSpace(input)) return null;
 

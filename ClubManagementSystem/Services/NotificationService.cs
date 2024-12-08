@@ -173,7 +173,6 @@ public class NotificationService
             }
         }
     }
-
         
     // Notifies 추가 메서드
     private void AddNotifies(int notificationID, List<int> userIds)
@@ -328,14 +327,16 @@ public class NotificationService
             }
         }
     }
-
     
-
     public void PrintAllNotifications()
     {
         try
         {
-            var notifications = context.Notifications.ToList();
+            var notifications = context.Notifications
+                .Include(n => n.Notifies) // Notifies 테이블 참조
+                .ThenInclude(nt => nt.User) // User 정보 로드
+                .ToList();
+
             if (!notifications.Any())
             {
                 Console.WriteLine("등록된 공지가 없습니다.");
@@ -343,9 +344,26 @@ public class NotificationService
             }
 
             Console.WriteLine("[공지 목록]");
+            Console.WriteLine("===================");
             foreach (var n in notifications)
             {
                 Console.WriteLine($"AnnounceID: {n.AnnounceID}, Desc: {n.Description}, Date: {n.Date:yyyy-MM-dd}");
+
+                // Notifies 데이터 출력
+                if (n.Notifies != null && n.Notifies.Any())
+                {
+                    Console.WriteLine("  대상 목록:");
+                    foreach (var notify in n.Notifies)
+                    {
+                        Console.WriteLine($"    UserID: {notify.UserID}, Name: {notify.User.FirstName} {notify.User.LastName}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("  대상 목록: (없음)");
+                }
+
+                Console.WriteLine("===================");
             }
         }
         catch (Exception ex)
@@ -354,7 +372,7 @@ public class NotificationService
         }
     }
 
-    private Notification? FindNotification()
+    public Notification? FindNotification()
     {
         while (true)
         {

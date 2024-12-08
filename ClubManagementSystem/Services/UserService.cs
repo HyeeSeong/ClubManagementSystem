@@ -39,15 +39,15 @@ public class UserService
             string Description = GetInput<string>("추가 정보", _ => true); // 빈 값 허용
             
             // 입력 정보 확인
-            Console.WriteLine("\n=========");
-            Console.WriteLine("[입력한 정보]");
-            Console.WriteLine($"성: {FirstName}");
-            Console.WriteLine($"이름: {LastName}");
-            Console.WriteLine($"이메일: {Email}");
-            Console.WriteLine($"휴대폰 번호: {Phone}");
-            Console.WriteLine($"생년월일: {Birthday:yyyy-MM-dd}");
-            Console.WriteLine("추가 정보: " + (string.IsNullOrWhiteSpace(Description) ? "(입력 없음)" : Description));
-            Console.WriteLine("=========\n");
+            // Console.WriteLine("\n=========");
+            // Console.WriteLine("[입력한 정보]");
+            // Console.WriteLine($"성: {FirstName}");
+            // Console.WriteLine($"이름: {LastName}");
+            // Console.WriteLine($"이메일: {Email}");
+            // Console.WriteLine($"휴대폰 번호: {Phone}");
+            // Console.WriteLine($"생년월일: {Birthday:yyyy-MM-dd}");
+            // Console.WriteLine("추가 정보: " + (string.IsNullOrWhiteSpace(Description) ? "(입력 없음)" : Description));
+            // Console.WriteLine("=========\n");
             
             // 객체 생성
             var newUser = new User
@@ -65,7 +65,7 @@ public class UserService
             context.SaveChanges();
 
             // 유저 타입 입력
-            Console.WriteLine("유저 타입을 선택해주세요 (1. 학생, 2. 교수, 3. 교직원)");
+            Console.Write("유저 타입을 선택해주세요 (1. 학생, 2. 교수, 3. 교직원): ");
             string type = Console.ReadLine();
 
             while (true)
@@ -90,7 +90,7 @@ public class UserService
                             }
 
                             // 클럽 선택
-                            Console.WriteLine("해당하는 동아리의 ClubID를 입력하세요. 동아리에 속하지 않으려면 빈 값으로 Enter를 누르세요.");
+                            Console.Write("해당하는 동아리의 ClubID를 입력하세요. 동아리에 속하지 않으려면 빈 값으로 Enter를 누르세요: ");
                             string clubInput = Console.ReadLine();
 
                             if (!string.IsNullOrWhiteSpace(clubInput) && int.TryParse(clubInput, out int clubID))
@@ -279,11 +279,11 @@ public class UserService
         }
     }
     
-    private User? FindUser()
+    public User? FindUser()
     {
         while (true)
         {
-            Console.WriteLine("유저를 검색합니다. 이름(LastName) 또는 이메일을 입력하세요 (빈 값 입력 시 검색 취소):");
+            Console.Write("유저를 검색합니다. 이름(LastName) 또는 이메일을 입력하세요 (빈 값 입력 시 검색 취소): ");
             string input = Console.ReadLine()?.Trim();
 
             if (string.IsNullOrWhiteSpace(input))
@@ -317,7 +317,7 @@ public class UserService
             }
 
             // UserID로 선택
-            Console.WriteLine("위 목록에서 UserID를 입력하세요 (빈 값 입력 시 취소):");
+            Console.Write("위 목록에서 UserID를 입력하세요 (빈 값 입력 시 취소): ");
             string idInput = Console.ReadLine()?.Trim();
             if (string.IsNullOrWhiteSpace(idInput))
             {
@@ -350,7 +350,6 @@ public class UserService
             }
 
             Console.WriteLine("\n[등록된 유저 목록]");
-            Console.WriteLine("==========================================");
             foreach (var user in users)
             {
                 Console.Write($"[{user.UserID}] ");
@@ -359,7 +358,6 @@ public class UserService
                 Console.Write($"휴대폰 번호: {user.PhoneNumber}, ");
                 Console.WriteLine($"생년월일: {user.Birth:yyyy-MM-dd}, ");
                 Console.WriteLine($"추가 정보: {(string.IsNullOrWhiteSpace(user.Description) ? "(없음)" : user.Description)}");
-                Console.WriteLine("==========================================");
             }
         }
         catch (Exception ex)

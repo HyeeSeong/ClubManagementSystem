@@ -155,7 +155,7 @@ public class ProjectService
             Console.WriteLine("[프로젝트 목록]");
             foreach (var p in projects)
             {
-                Console.WriteLine($"ProjectID: {p.ProjectID}, Name: {p.Name}, ClubID: {p.ClubID}, ClubName: {p.Club.ClubName}");
+                Console.WriteLine($"[{p.ProjectID}] Name: {p.Name}, ClubID: {p.ClubID}, ClubName: {p.Club.ClubName}");
             }
         }
         catch (Exception ex)
@@ -205,7 +205,221 @@ public class ProjectService
             Console.WriteLine("유효하지 않은 ProjectID.");
         }
     }
+    
+    // Report 추가
+    public bool InsertReport()
+    {
+        try
+        {
+            var project = FindProject();
+            if (project == null) return true;
 
+            DateTime reportDate = GetInput<DateTime>("Report 날짜(YYYY-MM-DD)", input => DateTime.TryParse(input, out _), "유효한 날짜 형식이 아닙니다.", input => DateTime.Parse(input));
+            string description = GetInput<string>("Description(빈 값 가능)", _ => true, "");
+
+            var report = new Report
+            {
+                ProjectID = project.ProjectID,
+                Date = reportDate,
+                Description = string.IsNullOrWhiteSpace(description) ? null : description
+            };
+
+            context.Reports.Add(report);
+            context.SaveChanges();
+            Console.WriteLine("Report가 추가되었습니다.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+            return false;
+        }
+    }
+
+    // Report 업데이트
+    public bool UpdateReport()
+    {
+        try
+        {
+            var report = FindReport();
+            if (report == null) return true;
+
+            Console.WriteLine($"선택한 Report: ReportID = {report.ReportID}, ProjectID = {report.ProjectID}, Date = {report.Date}, Desc = {report.Description}");
+            Console.WriteLine("[1. 날짜 변경, 2. 설명 변경, Enter 종료]");
+            while (true)
+            {
+                Console.Write("옵션 입력(Enter 종료): ");
+                string option = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(option)) break;
+
+                switch (option)
+                {
+                    case "1":
+                        report.Date = GetInput<DateTime>("새로운 날짜(YYYY-MM-DD)", input => DateTime.TryParse(input, out _), "유효한 날짜", input => DateTime.Parse(input));
+                        Console.WriteLine("날짜 변경 완료.");
+                        break;
+                    case "2":
+                        report.Description = GetInput<string>("새로운 설명(Enter 건너뛰기)", _ => true, "", input => string.IsNullOrWhiteSpace(input) ? report.Description : input);
+                        Console.WriteLine("설명 변경 완료.");
+                        break;
+                    default:
+                        Console.WriteLine("유효하지 않은 선택");
+                        break;
+                }
+            }
+
+            context.SaveChanges();
+            Console.WriteLine("Report 정보 업데이트 완료.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+            return false;
+        }
+    }
+
+    // Report 삭제
+    public bool DeleteReport()
+    {
+        try
+        {
+            var report = FindReport();
+            if (report == null) return true;
+
+            Console.WriteLine($"Report 삭제: ReportID = {report.ReportID}, ProjectID = {report.ProjectID}");
+            Console.Write("정말 삭제하시겠습니까? (Y/N): ");
+            string ans = Console.ReadLine()?.Trim().ToUpper();
+            if (ans == "Y")
+            {
+                context.Reports.Remove(report);
+                context.SaveChanges();
+                Console.WriteLine("Report 삭제 완료.");
+            }
+            else
+            {
+                Console.WriteLine("삭제 취소.");
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+            return false;
+        }
+    }
+
+    public Report? FindReport()
+    {
+        while (true)
+        {
+            Console.Write("Report를 검색합니다. ProjectName 또는 ReportID를 입력하세요 (Enter 입력 시 취소): ");
+            string input = Console.ReadLine()?.Trim();
+            if (string.IsNullOrWhiteSpace(input)) return null;
+
+            // ReportID로 검색
+            if (int.TryParse(input, out int id))
+            {
+                var reportByID = context.Reports.FirstOrDefault(r => r.ReportID == id);
+                if (reportByID != null) return reportByID;
+
+                Console.WriteLine("해당 ReportID에 대한 결과가 없습니다.");
+                continue;
+            }
+
+            // ProjectName으로 검색
+            var projects = context.Projects
+                .Where(p => p.Name.Contains(input))
+                .Include(p => p.Reports) // 관련 Report 로드
+                .ToList();
+
+            if (projects.Count == 0)
+            {
+                Console.WriteLine("입력한 ProjectName과 일치하는 프로젝트가 없습니다.");
+                continue;
+            }
+            
+            Console.WriteLine("검색된 프로젝트 목록:");
+            foreach (var p in projects)
+            { 
+                Console.WriteLine($"[{p.ProjectID}] Name: {p.Name}");
+            }
+
+            while (true)
+            {
+                Console.Write("선택할 ProjectID를 입력하세요 (Enter 입력 시 취소): ");
+                string projectInput = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(projectInput)) return null;
+
+                if (int.TryParse(projectInput, out int projectId))
+                {
+                    var selectedProject = projects.FirstOrDefault(p => p.ProjectID == projectId);
+                    if (selectedProject != null)
+                    {
+                        var reports = selectedProject.Reports.ToList();
+
+                        if (!reports.Any())
+                        {
+                            Console.WriteLine($"프로젝트 '{selectedProject.Name}'에 등록된 Report가 없습니다.");
+                            continue;
+                        }
+
+                        Console.WriteLine($"프로젝트 '{selectedProject.Name}'의 Report 목록:");
+                        foreach (var r in reports)
+                        {
+                            Console.WriteLine($"[{r.ReportID}], Date: {r.Date}, Description: {r.Description}");
+                        }
+
+                        Console.Write("선택할 ReportID를 입력하세요 (Enter 입력 시 취소): ");
+                        string reportInput = Console.ReadLine()?.Trim();
+                        if (string.IsNullOrWhiteSpace(reportInput)) return null;
+
+                        if (int.TryParse(reportInput, out int reportId))
+                        {
+                            var selectedReport = reports.FirstOrDefault(r => r.ReportID == reportId);
+                            if (selectedReport != null) return selectedReport;
+
+                            Console.WriteLine("유효하지 않은 ReportID입니다.");
+                            continue;
+                        }
+                    }
+                }
+                Console.WriteLine("유효하지 않은 ProjectID입니다.");
+            }
+        }
+    }
+
+    public void PrintAllReports()
+    {
+        try
+        {
+            var reports = context.Reports
+                .Include(r => r.Project) // 관련된 프로젝트 로드
+                .ToList();
+
+            if (!reports.Any())
+            {
+                Console.WriteLine("등록된 Report가 없습니다.");
+                return;
+            }
+
+            Console.WriteLine("[등록된 Report 목록]");
+            Console.WriteLine("======================================");
+            foreach (var report in reports)
+            {
+                Console.WriteLine($"ReportID: {report.ReportID}");
+                Console.WriteLine($"Project Name: {report.Project?.Name ?? "(삭제된 프로젝트)"}");
+                Console.WriteLine($"Date: {report.Date:yyyy-MM-dd}");
+                Console.WriteLine($"Description: {report.Description ?? "(없음)"}");
+                Console.WriteLine("======================================");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+        }
+    }
+    
     static T GetInput<T>(string prompt, Func<string, bool> validator, string errorMessage = "유효하지 않은 입력입니다.", Func<string, T> parser = null)
     {
         while (true)
