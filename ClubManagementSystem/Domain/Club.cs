@@ -13,4 +13,9 @@ public class Club
     public Staff Staff { get; set; } = null!;
     public ICollection<Student>? Students { get; set; }
     public ICollection<Project>? Projects { get; set; }
+
+    public override string ToString()
+    {
+        return $"[동아리 번호 : {ClubID}, 동아리 이름 : {ClubName}]";
+    }
 }

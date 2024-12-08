@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ClubManagementSystem.Domain;
+using ClubManagementSystem.Services;
 
 class Program
 {
@@ -10,21 +11,9 @@ class Program
         try
         {
             using var context = new ClubManagementContext();
-            
-            // 1. DB 연결 확인
-            Console.WriteLine("DB 연결 테스트...");
-            var userCount = context.Users.Count();
-            Console.WriteLine($"User 테이블 레코드 수: {userCount}");
-            
-            // 2. 특정 User 정보 조회
-            var user = context.Users
-                .FirstOrDefault(u => u.UserID == 1);
-            if (user != null)
-            {
-                Console.WriteLine($"ID=1인 User: {user.FirstName} {user.LastName}, Email={user.Email}");
-            }
-            
-            
+            var service = new UserService(context);
+            service.InsertUser();
+
         }
         catch (MySqlConnector.MySqlException ex)
         {
