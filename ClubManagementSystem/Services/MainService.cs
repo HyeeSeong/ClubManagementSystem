@@ -4,6 +4,7 @@ namespace ClubManagementSystem.Services;
 
 public class MainService
 {
+    public ClubManagementContext context { get; }
     public UserService UserService { get; }
     public ClubService ClubService { get; }
     public ClubRoomService ClubRoomService { get; }
@@ -14,6 +15,7 @@ public class MainService
 
     public MainService(ClubManagementContext context)
     {
+        this.context = context; 
         UserService = new UserService(context);
         ClubService = new ClubService(context);
         ClubRoomService = new ClubRoomService(context);
@@ -33,6 +35,7 @@ public class MainService
             Console.WriteLine("3. 동아리방 관리");
             Console.WriteLine("4. 프로젝트 관리");
             Console.WriteLine("5. 공지사항 관리");
+            Console.WriteLine("6. 고급 기능");
             Console.WriteLine("0. 종료");
             Console.Write("선택: ");
             string input = Console.ReadLine();
@@ -53,6 +56,9 @@ public class MainService
                     break;
                 case "5":
                     ManageNotifications();
+                    break;
+                case "6":
+                    AdvancedFeatures();
                     break;
                 case "0":
                     Console.WriteLine("시스템을 종료합니다.");
@@ -327,6 +333,60 @@ public class MainService
                     Console.WriteLine("유효하지 않은 선택입니다.");
                     break;
             }
+        }
+    }
+    
+    private void AdvancedFeatures()
+    {
+        while (true)
+        {
+            Console.WriteLine("[고급 기능]");
+            Console.WriteLine("1. 사용자 활동 로그 조회");
+            Console.WriteLine("2. 시스템 통계 보기");
+            Console.WriteLine("3. 프로젝트 통계 보기");
+            Console.WriteLine("0. 이전 메뉴");
+            Console.Write("선택: ");
+            string input = Console.ReadLine();
+
+            switch (input)
+            {
+                case "1":
+                    UserService.PrintUserActivity();
+                    break;
+                case "2":
+                    PrintSystemStatistics();
+                    break;
+                case "3":
+                    ProjectService.PrintProjectStatistics();
+                    break;
+                case "0":
+                    return;
+                default:
+                    Console.WriteLine("유효하지 않은 선택입니다.");
+                    break;
+            }
+        }
+    }
+    
+    public void PrintSystemStatistics()
+    {
+        try
+        {
+            int totalUsers = context.Users.Count();
+            int activeClubs = context.Clubs.Count();
+            int activeProjects = context.Projects.Count();
+            int totalNotifications = context.Notifications.Count();
+
+            Console.WriteLine("\n[시스템 통계]");
+            Console.WriteLine($"- 총 사용자 수: {totalUsers}");
+            Console.WriteLine($"- 활성 동아리 수: {activeClubs}");
+            Console.WriteLine($"- 진행 중인 프로젝트 수: {activeProjects}");
+            Console.WriteLine($"- 총 공지 수: {totalNotifications}");
+            Console.WriteLine("====================================");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
         }
     }
 }

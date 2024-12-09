@@ -1,4 +1,5 @@
 using ClubManagementSystem.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubManagementSystem.Services;
 
@@ -358,6 +359,62 @@ public class UserService
                 Console.Write($"휴대폰 번호: {user.PhoneNumber}, ");
                 Console.WriteLine($"생년월일: {user.Birth:yyyy-MM-dd}, ");
                 Console.WriteLine($"추가 정보: {(string.IsNullOrWhiteSpace(user.Description) ? "(없음)" : user.Description)}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+        }
+    }
+    
+    public void PrintUserActivity()
+    {
+        try
+        {
+            Console.WriteLine("활동 로그를 조회할 사용자의 이름(LastName)을 입력하세요:");
+            string lastName = Console.ReadLine()?.Trim();
+
+            var users = context.Users
+                .Where(u => u.LastName.Contains(lastName))
+                .Include(u => u.Student)
+                .ThenInclude(s => s.Participations)
+                .ThenInclude(p => p.Project)
+                .Include(u => u.Professor)
+                .ThenInclude(p => p.Evaluations)
+                .ThenInclude(e => e.Project)
+                .ToList();
+
+            if (!users.Any())
+            {
+                Console.WriteLine("검색된 사용자가 없습니다.");
+                return;
+            }
+
+            foreach (var user in users)
+            {
+                Console.WriteLine($"\n[UserID: {user.UserID}, Name: {user.FirstName} {user.LastName}]");
+
+                // 프로젝트 참여 로그
+                if (user.Student?.Participations != null && user.Student.Participations.Any())
+                {
+                    Console.WriteLine("  참여 프로젝트:");
+                    foreach (var participation in user.Student.Participations)
+                    {
+                        Console.WriteLine($"    - {participation.Project.Name}");
+                    }
+                }
+
+                // 평가 로그
+                if (user.Professor?.Evaluations != null && user.Professor.Evaluations.Any())
+                {
+                    Console.WriteLine("  평가한 프로젝트:");
+                    foreach (var evaluation in user.Professor.Evaluations)
+                    {
+                        Console.WriteLine($"    - {evaluation.Project.Name} (Score: {evaluation.Score})");
+                    }
+                }
+
+                Console.WriteLine("====================================");
             }
         }
         catch (Exception ex)

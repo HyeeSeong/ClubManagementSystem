@@ -420,6 +420,41 @@ public class ProjectService
         }
     }
     
+    public void PrintProjectStatistics()
+    {
+        try
+        {
+            var projects = context.Projects
+                .Include(p => p.Participations)
+                .Include(p => p.Evaluations)
+                .ToList();
+
+            if (!projects.Any())
+            {
+                Console.WriteLine("진행 중인 프로젝트가 없습니다.");
+                return;
+            }
+
+            Console.WriteLine("\n[프로젝트 통계]");
+            foreach (var project in projects)
+            {
+                int participantCount = project.Participations?.Count ?? 0;
+                decimal averageScore = project.Evaluations?.Any() == true
+                    ? project.Evaluations.Average(e => e.Score)
+                    : 0;
+
+                Console.WriteLine($"- 프로젝트: {project.Name}");
+                Console.WriteLine($"  참여자 수: {participantCount}");
+                Console.WriteLine($"  평균 평가 점수: {(project.Evaluations?.Any() == true ? $"{averageScore:F2}" : "N/A")}");
+                Console.WriteLine("------------------------------------");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"오류 발생: {ex.Message}");
+        }
+    }
+    
     static T GetInput<T>(string prompt, Func<string, bool> validator, string errorMessage = "유효하지 않은 입력입니다.", Func<string, T> parser = null)
     {
         while (true)

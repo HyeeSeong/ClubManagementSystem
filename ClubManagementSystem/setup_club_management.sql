@@ -14,7 +14,7 @@ USE club_management;
 -- --------------------------------------------
 DROP TABLE IF EXISTS `User`;
 CREATE TABLE Users (
-                       UserID INT AUTO_INCREMENT PRIMARY KEY ,
+                       UserID INT AUTO_INCREMENT PRIMARY KEY,
                        FirstName VARCHAR(50) NOT NULL,
                        LastName VARCHAR(50) NOT NULL,
                        Email VARCHAR(100) NOT NULL UNIQUE,
