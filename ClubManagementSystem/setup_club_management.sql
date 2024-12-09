@@ -98,7 +98,7 @@ DROP TABLE IF EXISTS `Notification`;
 CREATE TABLE Notifications (
                                AnnounceID INT AUTO_INCREMENT PRIMARY KEY,
                                Description TEXT NOT NULL,
-                               Date DATE NOT NULL DEFAULT CURRENT_DATE()
+                               Date DATE NOT NULL DEFAULT '2000-01-01'
 );
 
 -- --------------------------------------------
@@ -134,7 +134,7 @@ CREATE TABLE Evaluations (
                              ProfessorID INT NOT NULL,
                              ProjectID INT NOT NULL,
                              Score DECIMAL(5,2) NOT NULL,
-                             Date DATE NOT NULL DEFAULT CURRENT_DATE(),
+                             Date DATE NOT NULL DEFAULT '2000-01-01',
                              FOREIGN KEY (ProfessorID) REFERENCES Professors(UserID) ON DELETE CASCADE,
                              FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID) ON DELETE CASCADE
 );
@@ -210,14 +210,14 @@ VALUES
 -- Notifications 테이블
 INSERT INTO Notifications (Description, Date)
 VALUES
-    ('탐정 동아리에 오신 것을 환영합니다!', CURRENT_DATE()),
-    ('어린이 과학 모임이 다음 주에 열립니다.', CURRENT_DATE());
+    ('탐정 동아리에 오신 것을 환영합니다!', CURRENT_DATE),
+    ('어린이 과학 모임이 다음 주에 열립니다.', CURRENT_DATE);
 
 -- Reports 테이블
 INSERT INTO Reports (ProjectID, Date, Description)
 VALUES
-    (1, CURRENT_DATE(), '첫 번째 사건: 보석 살인 사건을 해결했습니다.'),
-    (2, CURRENT_DATE(), '발명품의 성능을 개선한 결과를 발표했습니다.');
+    (1, CURRENT_DATE, '첫 번째 사건: 보석 살인 사건을 해결했습니다.'),
+    (2, CURRENT_DATE, '발명품의 성능을 개선한 결과를 발표했습니다.');
 
 -- Participations 테이블
 INSERT INTO Participations (StudentID, ProjectID)
@@ -229,8 +229,8 @@ VALUES
 -- Evaluations 테이블
 INSERT INTO Evaluations (ProfessorID, ProjectID, Score, Date)
 VALUES
-    (2, 1, 95.5, CURRENT_DATE()),
-    (9, 2, 88.0, CURRENT_DATE());
+    (2, 1, 95.5, CURRENT_DATE),
+    (9, 2, 88.0, CURRENT_DATE);
 
 -- Notifies 테이블
 INSERT INTO Notifies (NotificationID, UserID)
